@@ -62,12 +62,12 @@ const enterMarkets = async () => {
   const encodeABI = await comptroller.methods
     .enterMarkets([usdkCtokenAddress])
     .encodeABI();
-  _promise(accountAddress, usdkAddress, encodeABI);
+  _promise(accountAddress, comptrollerAddress, encodeABI);
 };
 const mint = async () => {
   const amount = await usdkContract.methods.balanceOf(accountAddress).call();
-  const encodeABI = await cUSDKContract.methods.mint(amount).encodeABI();
-  _promise(accountAddress, usdkAddress, encodeABI);
+  const encodeABI = await cUSDKContract.methods.mint(web3.utils.toBN(amount)).encodeABI();
+  _promise(accountAddress, usdkCtokenAddress, encodeABI);
 };
 async function runBot() {
   await approve();
