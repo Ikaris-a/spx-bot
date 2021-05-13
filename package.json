@@ -1,0 +1,33 @@
+{
+  "name": "honey-room-server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "axios": "^0.20.0",
+    "bignumber.js": "^7.2.1",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "~1.4.4",
+    "crypto": "^1.0.1",
+    "debug": "~2.6.9",
+    "ethereumjs-tx": "^2.1.2",
+    "express": "~4.16.1",
+    "fs": "0.0.1-security",
+    "ganache-cli": "^6.12.2",
+    "http": "0.0.1-security",
+    "http-errors": "~1.6.3",
+    "http-server": "^0.12.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1",
+    "node-fetch": "^2.6.1",
+    "tronweb": "^3.0.0",
+    "web3": "^1.2.0"
+  },
+  "devDependencies": {
+    "mongoose": "^5.12.2",
+    "mongoose-paginate": "^5.0.3"
+  }
+}
