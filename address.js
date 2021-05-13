@@ -3,14 +3,24 @@ var EventEmitter = require("events").EventEmitter;
 var EthereumTx = require("ethereumjs-tx");
 const NODE_HOST = "https://exchaintestrpc.okex.org";
 var cTokenAbi = require("./abis/CToken.json");
+var tokenAbi = require("./abis/CErc20.json");
+const comptrollerAbi = require("./abis/Comptroller.json");
 const web3 = new Web3(new Web3.providers.HttpProvider(NODE_HOST));
-const usdkContractAddress = "0xE2149C91A8767Af701D0f20DA61AF01E32d7C225";
+const usdkAddress = "0xE2149C91A8767Af701D0f20DA61AF01E32d7C225";
 const usdkCtokenAddress = "0xaD28B23198d8C45F6470F5d09F73897A502Cf45E";
-const usdkContract = new web3.eth.Contract(cTokenAbi, usdkContractAddress);
-const privateKey =
-  "02f066318ec663ba0f687984c1122b47addd9f3cacc30e3c0789d8d5ae7a292e";
+const comptrollerAddress = "0xA9432753135cad988982c941f32fabf8d781041E";
+const usdkContract = new web3.eth.Contract(tokenAbi, usdkAddress);
+
+const cUSDKContract = new web3.eth.Contract(cTokenAbi, usdkCtokenAddress);
+const comptroller = new web3.eth.Contract(comptrollerAbi, comptrollerAddress);
+const privateKey = Buffer.from(
+  "02f066318ec663ba0f687984c1122b47addd9f3cacc30e3c0789d8d5ae7a292e",
+  "hex"
+);
 const accountAddress = "0x1BE31032C039be3D1e4130bbAf81dD78fd5016b1";
+
 function sendSigned(txData, callback) {
+  console.log("=========");
   var transaction = new EthereumTx(txData);
   transaction.sign(privateKey);
   const serializedTx = transaction.serialize().toString("hex");
@@ -29,10 +39,12 @@ function _promise(from, to, encodeABI) {
       };
       sendSigned(txData, function (err, res) {
         if (!!err) {
-          // console.log(err);
+          console.log(err);
           return;
         }
+
         console.log("transactionHash:" + res);
+        return res;
       });
     });
   } catch (error) {
@@ -43,6 +55,23 @@ const approve = async (amount = -1) => {
   const encodeABI = await usdkContract.methods
     .approve(usdkCtokenAddress, web3.utils.toTwosComplement(amount))
     .encodeABI();
-  _promise(accountAddress, usdkContractAddress, encodeABI);
+  _promise(accountAddress, usdkAddress, encodeABI);
 };
-approve();
+
+const enterMarkets = async () => {
+  const encodeABI = await comptroller.methods
+    .enterMarkets([usdkCtokenAddress])
+    .encodeABI();
+  _promise(accountAddress, usdkAddress, encodeABI);
+};
+const mint = async () => {
+  const amount = await usdkContract.methods.balanceOf(accountAddress).call();
+  const encodeABI = await cUSDKContract.methods.mint(amount).encodeABI();
+  _promise(accountAddress, usdkAddress, encodeABI);
+};
+async function runBot() {
+  await approve();
+  await enterMarkets();
+  await mint();
+}
+runBot();
